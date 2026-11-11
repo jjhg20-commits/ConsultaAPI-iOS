@@ -1,5 +1,5 @@
 
-name: Compilar ConsultaAPI iOS
+name: Ejecutar ConsultaAPI en iPhone
 
 on:
   workflow_dispatch:
@@ -21,7 +21,7 @@ jobs:
       - name: Generar proyecto Xcode
         run: xcodegen generate
 
-      - name: Compilar aplicación iOS
+      - name: Compilar aplicación
         run: |
           xcodebuild \
             -project ConsultaAPI.xcodeproj \
@@ -32,8 +32,30 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             build
 
-      - name: Guardar aplicación compilada
+      - name: Iniciar simulador de iPhone
+        run: |
+          DEVICE_ID=$(xcrun simctl list devices available | grep -m1 -E 'iPhone.*\([A-F0-9-]{36}\)' | sed -E 's/.*\(([A-F0-9-]{36})\).*/\1/')
+          echo "DEVICE_ID=$DEVICE_ID" >> $GITHUB_ENV
+          xcrun simctl boot "$DEVICE_ID"
+          xcrun simctl bootstatus "$DEVICE_ID" -b
+
+      - name: Instalar aplicación
+        run: |
+          xcrun simctl install "$DEVICE_ID" \
+            build/Build/Products/Debug-iphonesimulator/ConsultaAPI.app
+
+      - name: Ejecutar aplicación
+        run: |
+          xcrun simctl launch "$DEVICE_ID" com.consultaapi.app
+          sleep 20
+
+      - name: Capturar pantalla del iPhone
+        run: |
+          mkdir -p evidencias
+          xcrun simctl io "$DEVICE_ID" screenshot evidencias/ConsultaAPI-iPhone.png
+
+      - name: Guardar evidencias
         uses: actions/upload-artifact@v4
         with:
-          name: ConsultaAPI-iOS
-          path: build/Build/Products/Debug-iphonesimulator/ConsultaAPI.app
+          name: Evidencias-ConsultaAPI
+          path: evidencias/
