@@ -1,0 +1,39 @@
+
+name: Compilar ConsultaAPI iOS
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Descargar proyecto
+        uses: actions/checkout@v4
+
+      - name: Instalar XcodeGen
+        run: brew install xcodegen
+
+      - name: Generar proyecto Xcode
+        run: xcodegen generate
+
+      - name: Compilar aplicación iOS
+        run: |
+          xcodebuild \
+            -project ConsultaAPI.xcodeproj \
+            -scheme ConsultaAPI \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
+      - name: Guardar aplicación compilada
+        uses: actions/upload-artifact@v4
+        with:
+          name: ConsultaAPI-iOS
+          path: build/Build/Products/Debug-iphonesimulator/ConsultaAPI.app
