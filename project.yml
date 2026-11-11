@@ -1,0 +1,28 @@
+
+name: ConsultaAPI
+
+options:
+  bundleIdPrefix: com.consultaapi
+  deploymentTarget:
+    iOS: "16.0"
+
+targets:
+  ConsultaAPI:
+    type: application
+    platform: iOS
+
+    sources:
+      - ConsultaAPIApp.swift
+      - ContentView.swift
+      - Post.swift
+      - PostService.swift
+
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.consultaapi.app
+        PRODUCT_NAME: ConsultaAPI
+        SWIFT_VERSION: "5.0"
+        TARGETED_DEVICE_FAMILY: "1,2"
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
