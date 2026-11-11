@@ -6,15 +6,28 @@ struct ContentView: View {
     @State private var publicaciones: [Post] = []
     @State private var cargando = false
     @State private var mensajeError: String?
+    @State private var textoBusqueda = ""
 
     private let servicio = PostService()
+
+    // Filtrar publicaciones por título
+    var publicacionesFiltradas: [Post] {
+        if textoBusqueda.isEmpty {
+            return publicaciones
+        }
+
+        return publicaciones.filter {
+            $0.title.localizedCaseInsensitiveContains(textoBusqueda)
+        }
+    }
 
     var body: some View {
 
         NavigationStack {
 
-            VStack(spacing: 15) {
+            VStack(spacing: 12) {
 
+                // Botón para consultar publicaciones
                 Button {
                     Task {
                         await consultarPublicaciones()
@@ -35,6 +48,22 @@ struct ContentView: View {
                 .disabled(cargando)
                 .padding(.horizontal)
 
+                // Barra de búsqueda
+                HStack {
+                    Image(systemName: "magnifyingglass")
+                        .foregroundColor(.gray)
+
+                    TextField(
+                        "Buscar por título...",
+                        text: $textoBusqueda
+                    )
+                    .autocorrectionDisabled()
+                }
+                .padding(12)
+                .background(Color(.systemGray6))
+                .cornerRadius(10)
+                .padding(.horizontal)
+
                 if cargando {
                     ProgressView("Consultando servidor...")
                         .padding()
@@ -46,7 +75,8 @@ struct ContentView: View {
                         .padding()
                 }
 
-                List(publicaciones) { post in
+                // Lista de publicaciones filtradas
+                List(publicacionesFiltradas) { post in
 
                     VStack(alignment: .leading, spacing: 8) {
 
@@ -72,6 +102,15 @@ struct ContentView: View {
                     }
                     .padding(.vertical, 8)
                 }
+
+                if !textoBusqueda.isEmpty &&
+                    publicacionesFiltradas.isEmpty &&
+                    !cargando {
+
+                    Text("No se encontraron publicaciones.")
+                        .foregroundColor(.secondary)
+                        .padding()
+                }
             }
             .navigationTitle("POSTS")
             .toolbarBackground(Color.red, for: .navigationBar)
@@ -79,8 +118,8 @@ struct ContentView: View {
             .toolbarColorScheme(.dark, for: .navigationBar)
         }
         .task {
-    await consultarPublicaciones()
-}
+            await consultarPublicaciones()
+        }
     }
 
     @MainActor
