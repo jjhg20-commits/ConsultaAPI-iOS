@@ -48,21 +48,31 @@ struct ContentView: View {
                 .disabled(cargando)
                 .padding(.horizontal)
 
-                // Barra de búsqueda
-                HStack {
-                    Image(systemName: "magnifyingglass")
-                        .foregroundColor(.gray)
+               
+// Barra de búsqueda
+HStack {
+    Image(systemName: "magnifyingglass")
+        .foregroundColor(.gray)
 
-                    TextField(
-                        "Buscar por título...",
-                        text: $textoBusqueda
-                    )
-                    .autocorrectionDisabled()
-                }
-                .padding(12)
-                .background(Color(.systemGray6))
-                .cornerRadius(10)
-                .padding(.horizontal)
+    TextField(
+        "Buscar por título...",
+        text: $textoBusqueda
+    )
+    .autocorrectionDisabled()
+
+    if !textoBusqueda.isEmpty {
+        Button {
+            textoBusqueda = ""
+        } label: {
+            Image(systemName: "xmark.circle.fill")
+                .foregroundColor(.gray)
+        }
+    }
+}
+.padding(12)
+.background(Color(.systemGray6))
+.cornerRadius(10)
+.padding(.horizontal)
 
                 if cargando {
                     ProgressView("Consultando servidor...")
