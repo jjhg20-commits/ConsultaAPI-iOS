@@ -78,6 +78,9 @@ struct ContentView: View {
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
         }
+        .task {
+    await consultarPublicaciones()
+}
     }
 
     @MainActor
